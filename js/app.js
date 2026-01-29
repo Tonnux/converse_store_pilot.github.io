@@ -3,6 +3,9 @@
  * Maneja la renderización de productos y la interacción general
  */
 
+// Variable para rastrear si hay búsqueda activa
+let isSearchActive = false;
+
 /**
  * Inicializa el menú móvil (hamburguesa)
  */
@@ -12,12 +15,10 @@ function initMobileMenu() {
     
     if (!menuToggle || !mobileNav) return;
 
-    // Toggle del menú
     menuToggle.addEventListener('click', () => {
         const isOpen = mobileNav.classList.toggle('open');
         menuToggle.setAttribute('aria-expanded', isOpen);
         
-        // Cambia el icono
         if (isOpen) {
             menuToggle.innerHTML = `
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -36,7 +37,6 @@ function initMobileMenu() {
         }
     });
 
-    // Cierra el menú al hacer click en enlaces con ancla (scroll interno)
     mobileNav.querySelectorAll('a[data-close-menu], a[href^="#"]').forEach(link => {
         link.addEventListener('click', () => {
             mobileNav.classList.remove('open');
@@ -51,38 +51,10 @@ function initMobileMenu() {
         });
     });
 
-    // Cierra el menú en resize a desktop
     window.addEventListener('resize', () => {
         if (window.innerWidth >= 1024) {
             mobileNav.classList.remove('open');
             menuToggle.setAttribute('aria-expanded', 'false');
-        }
-    });
-}
-
-/**
- * Inicializa la búsqueda móvil
- */
-function initMobileSearch() {
-    const mobileSearchInput = document.getElementById('mobileSearchInput');
-    if (!mobileSearchInput) return;
-
-    mobileSearchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const query = mobileSearchInput.value.trim();
-            if (query) {
-                const results = searchProducts(query);
-                if (results.length > 0) {
-                    renderProducts(results, 'productsGrid');
-                    // Cierra menú móvil
-                    document.getElementById('mobileNav')?.classList.remove('open');
-                    document.getElementById('menuToggle')?.setAttribute('aria-expanded', 'false');
-                    // Scroll al grid
-                    document.getElementById('productos')?.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    alert('No se encontraron productos con: ' + query);
-                }
-            }
         }
     });
 }
@@ -137,6 +109,95 @@ function renderProducts(products, containerId) {
 }
 
 /**
+ * Muestra el estado vacío de búsqueda
+ * @param {string} query - Término buscado
+ */
+function showEmptySearchState(query) {
+    const productsGrid = document.getElementById('productsGrid');
+    const emptyState = document.getElementById('searchEmptyState');
+    
+    if (productsGrid) {
+        productsGrid.innerHTML = '';
+        productsGrid.style.display = 'none';
+    }
+    
+    if (emptyState) {
+        emptyState.style.display = 'flex';
+        const querySpan = emptyState.querySelector('.search-query');
+        if (querySpan) {
+            querySpan.textContent = query;
+        }
+    }
+}
+
+/**
+ * Oculta el estado vacío y muestra el grid
+ */
+function hideEmptySearchState() {
+    const productsGrid = document.getElementById('productsGrid');
+    const emptyState = document.getElementById('searchEmptyState');
+    
+    if (emptyState) {
+        emptyState.style.display = 'none';
+    }
+    
+    if (productsGrid) {
+        productsGrid.style.display = 'grid';
+    }
+}
+
+/**
+ * Limpia la búsqueda y muestra todos los productos
+ */
+function clearSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    
+    if (searchInput) searchInput.value = '';
+    if (mobileSearchInput) mobileSearchInput.value = '';
+    
+    isSearchActive = false;
+    hideEmptySearchState();
+    
+    // Muestra todos los productos
+    const allProducts = getAllProducts();
+    renderProducts(allProducts, 'productsGrid');
+}
+
+/**
+ * Ejecuta la búsqueda en tiempo real
+ * @param {string} query - Término de búsqueda
+ */
+function performSearch(query) {
+    const trimmedQuery = query.trim();
+    
+    // Si el campo está vacío, muestra todos los productos
+    if (trimmedQuery === '') {
+        isSearchActive = false;
+        hideEmptySearchState();
+        const allProducts = getAllProducts();
+        renderProducts(allProducts, 'productsGrid');
+        return;
+    }
+    
+    isSearchActive = true;
+    const results = searchProducts(trimmedQuery);
+    
+    if (results.length === 0) {
+        showEmptySearchState(trimmedQuery);
+    } else {
+        hideEmptySearchState();
+        renderProducts(results, 'productsGrid');
+    }
+    
+    // Scroll suave al grid de productos
+    const productosSection = document.getElementById('productos');
+    if (productosSection && trimmedQuery.length >= 2) {
+        productosSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+/**
  * Agrega producto al carrito rápidamente (sin seleccionar talla)
  * @param {number} productId - ID del producto
  * @param {Event} event - Evento del click
@@ -145,10 +206,8 @@ function quickAddToCart(productId, event) {
     event.preventDefault();
     event.stopPropagation();
     
-    // Talla por defecto para quick add
     addToCart(productId, '25', 1);
     
-    // Feedback visual en el botón
     const btn = event.currentTarget;
     const originalText = btn.innerHTML;
     btn.innerHTML = `
@@ -166,30 +225,54 @@ function quickAddToCart(productId, event) {
 }
 
 /**
- * Inicializa la búsqueda de productos
+ * Inicializa la búsqueda en tiempo real
  */
 function initSearch() {
     const searchInput = document.getElementById('searchInput');
-    if (!searchInput) return;
-
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const query = searchInput.value.trim();
-            if (query) {
-                // En el piloto, simplemente filtra los productos visibles
-                const results = searchProducts(query);
-                if (results.length > 0) {
-                    renderProducts(results, 'productsGrid');
-                    // Scroll al grid de productos
-                    document.getElementById('productos').scrollIntoView({ 
-                        behavior: 'smooth' 
-                    });
-                } else {
-                    alert('No se encontraron productos con: ' + query);
-                }
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    
+    // Búsqueda en tiempo real - input desktop
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            performSearch(e.target.value);
+        });
+        
+        // También con Enter para UX esperada
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch(e.target.value);
             }
-        }
-    });
+        });
+    }
+    
+    // Búsqueda en tiempo real - input móvil
+    if (mobileSearchInput) {
+        mobileSearchInput.addEventListener('input', (e) => {
+            performSearch(e.target.value);
+            // Sincroniza con input desktop
+            if (searchInput) searchInput.value = e.target.value;
+        });
+        
+        mobileSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch(e.target.value);
+                // Cierra menú móvil
+                document.getElementById('mobileNav')?.classList.remove('open');
+                document.getElementById('menuToggle')?.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+    
+    // Botón "Ver todo" en el estado vacío
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            clearSearch();
+        });
+    }
 }
 
 /**
@@ -209,12 +292,10 @@ function initScrollAnimations() {
         });
     }, observerOptions);
 
-    // Observa elementos con la clase 'fade-in'
     document.querySelectorAll('.fade-in').forEach(el => {
         observer.observe(el);
     });
 
-    // Observa las cards de producto
     document.querySelectorAll('.product-card').forEach(el => {
         observer.observe(el);
     });
@@ -231,9 +312,7 @@ function initSmoothScroll() {
             const targetElement = document.querySelector(targetId);
             
             if (targetElement) {
-                // Cierra el carrito si está abierto
                 closeCart();
-                
                 targetElement.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
@@ -248,7 +327,6 @@ function initSmoothScroll() {
  */
 function initHeaderScroll() {
     const header = document.querySelector('.header');
-    let lastScroll = 0;
 
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
@@ -258,8 +336,6 @@ function initHeaderScroll() {
         } else {
             header.classList.remove('scrolled');
         }
-
-        lastScroll = currentScroll;
     });
 }
 
@@ -267,33 +343,26 @@ function initHeaderScroll() {
  * Inicialización principal cuando el DOM está listo
  */
 document.addEventListener('DOMContentLoaded', () => {
-    // Renderiza productos en la página principal
     const newProductsGrid = document.getElementById('newProductsGrid');
     const productsGrid = document.getElementById('productsGrid');
 
     if (newProductsGrid) {
-        // Productos nuevos (4 productos)
         const newProducts = getNewProducts(4);
         renderProducts(newProducts, 'newProductsGrid');
     }
 
     if (productsGrid) {
-        // Productos más vendidos (8 productos)
-        const bestsellers = getBestsellerProducts(8);
-        // Si no hay suficientes bestsellers, completa con todos los productos
-        const allProducts = bestsellers.length >= 8 ? bestsellers : getAllProducts();
+        const allProducts = getAllProducts();
         renderProducts(allProducts, 'productsGrid');
     }
 
     // Inicializa funcionalidades
     initMobileMenu();
-    initMobileSearch();
     initSearch();
     initSmoothScroll();
     initHeaderScroll();
 
-    // Inicializa animaciones después de un pequeño delay
     setTimeout(initScrollAnimations, 100);
 
-    console.log('🏪 Converse Oaxaca - Tienda Demo cargada correctamente');
+    console.log('🏪 Converse Oaxaca - Tienda cargada');
 });

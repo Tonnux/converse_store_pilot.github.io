@@ -121,11 +121,22 @@
     <!-- Productos - Catálogo Principal -->
     <section class="products-section" id="productos">
         <div class="section-header">
-            <h2 class="section-title">Lo Más Vendido</h2>
+            <h2 class="section-title">Nuestros Productos</h2>
             <p class="section-subtitle">Los favoritos de nuestra tienda en Oaxaca</p>
         </div>
         <div class="products-grid" id="productsGrid">
             <!-- Productos se cargan dinámicamente -->
+        </div>
+        <!-- Estado vacío de búsqueda -->
+        <div class="search-empty-state" id="searchEmptyState" style="display: none;">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <h3>No encontramos resultados</h3>
+            <p>No hay productos que coincidan con "<span class="search-query"></span>"</p>
+            <p class="search-hint">Prueba con otro nombre o color</p>
+            <button class="btn btn-secondary" id="clearSearchBtn">Ver todo</button>
         </div>
     </section>
 

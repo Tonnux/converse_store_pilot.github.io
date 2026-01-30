@@ -8,10 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
-    
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="img/logos/favicon.png">
-
 </head>
 <body>
     <!-- Barra de promoción superior -->
@@ -32,16 +29,16 @@
             </button>
 
             <!-- Logo -->
-             <a href="index.html" class="logo" aria-label="Converse Oaxaca">
+            <a href="index.html" class="logo" aria-label="Converse Oaxaca">
                 <img src="img/logos/Converse-Logo.jpg" alt="Converse Oaxaca" class="logo-img">
             </a>
 
-
             <!-- Navegación Desktop -->
-            <nav class="nav-main">
-                <a href="index.html" class="nav-link active">Inicio</a>
-                <a href="#productos" class="nav-link">Productos</a>
-                <a href="#nuevos" class="nav-link">Nuevos</a>
+            <nav class="nav-main" id="navMain">
+                <a href="#productos" class="nav-link" data-filter="calzado">Calzado</a>
+                <a href="#productos" class="nav-link" data-filter="accesorios">Accesorios</a>
+                <a href="#productos" class="nav-link" data-filter="juvenil">Juvenil</a>
+                <a href="#productos" class="nav-link" data-filter="infantil">Infantil</a>
             </nav>
 
             <!-- Acciones -->
@@ -71,9 +68,11 @@
 
         <!-- Menú móvil desplegable -->
         <nav class="mobile-nav" id="mobileNav">
-            <a href="index.html" class="mobile-nav-link active">Inicio</a>
-            <a href="#productos" class="mobile-nav-link" data-close-menu>Productos</a>
-            <a href="#nuevos" class="mobile-nav-link" data-close-menu>Nuevos</a>
+            <a href="#productos" class="mobile-nav-link" data-filter="calzado" data-close-menu>Calzado</a>
+            <a href="#productos" class="mobile-nav-link" data-filter="accesorios" data-close-menu>Accesorios</a>
+            <a href="#productos" class="mobile-nav-link" data-filter="juvenil" data-close-menu>Juvenil</a>
+            <a href="#productos" class="mobile-nav-link" data-filter="infantil" data-close-menu>Infantil</a>
+            
             <!-- Buscador móvil -->
             <div class="mobile-search">
                 <input type="text" placeholder="Buscar productos..." id="mobileSearchInput">
@@ -100,6 +99,48 @@
         </div>
     </section>
 
+    <!-- Sección: Lo que vendemos (Categorías) -->
+    <section class="categories-section" id="categorias">
+        <div class="section-header">
+            <h2 class="section-title">Lo que vendemos</h2>
+            <p class="section-subtitle">Explora nuestras categorías</p>
+        </div>
+        <div class="categories-grid">
+            <!-- Card Calzado -->
+            <a href="#productos" class="category-card" data-filter="calzado">
+                <div class="category-card-image">
+                    <img src="https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=400&q=80" alt="Calzado Converse">
+                </div>
+                <div class="category-card-content">
+                    <h3 class="category-card-title">Calzado</h3>
+                    <p class="category-card-desc">Chuck Taylor, Run Star y más</p>
+                </div>
+            </a>
+            
+            <!-- Card Accesorios -->
+            <a href="#productos" class="category-card" data-filter="accesorios">
+                <div class="category-card-image">
+                    <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80" alt="Accesorios Converse">
+                </div>
+                <div class="category-card-content">
+                    <h3 class="category-card-title">Accesorios</h3>
+                    <p class="category-card-desc">Mochilas y Collares</p>
+                </div>
+            </a>
+            
+            <!-- Card Juvenil / Infantil -->
+            <a href="#productos" class="category-card" data-filter="juvenil">
+                <div class="category-card-image">
+                    <img src="https://images.unsplash.com/photo-1514989940723-e8e51635b782?w=400&q=80" alt="Converse Juvenil e Infantil">
+                </div>
+                <div class="category-card-content">
+                    <h3 class="category-card-title">Juvenil / Infantil</h3>
+                    <p class="category-card-desc">Tallas para jóvenes y niños</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
     <!-- Campaña Banner -->
     <section class="campaign-banner">
         <div class="campaign-content">
@@ -120,16 +161,27 @@
         </div>
     </section>
 
-    <!-- Productos - Catálogo Principal -->
+    <!-- Productos - Catálogo Principal con Filtros -->
     <section class="products-section" id="productos">
         <div class="section-header">
             <h2 class="section-title">Nuestros Productos</h2>
             <p class="section-subtitle">Los favoritos de nuestra tienda en Oaxaca</p>
         </div>
+        
+        <!-- Barra de filtros -->
+        <div class="filters-bar" id="filtersBar">
+            <button class="filter-btn active" data-filter="todos">Todos</button>
+            <button class="filter-btn" data-filter="calzado">Calzado</button>
+            <button class="filter-btn" data-filter="accesorios">Accesorios</button>
+            <button class="filter-btn" data-filter="juvenil">Juvenil</button>
+            <button class="filter-btn" data-filter="infantil">Infantil</button>
+        </div>
+        
         <div class="products-grid" id="productsGrid">
             <!-- Productos se cargan dinámicamente -->
         </div>
-        <!-- Estado vacío de búsqueda -->
+        
+        <!-- Estado vacío de búsqueda/filtro -->
         <div class="search-empty-state" id="searchEmptyState" style="display: none;">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <circle cx="11" cy="11" r="8"/>
@@ -137,7 +189,7 @@
             </svg>
             <h3>No encontramos resultados</h3>
             <p>No hay productos que coincidan con "<span class="search-query"></span>"</p>
-            <p class="search-hint">Prueba con otro nombre o color</p>
+            <p class="search-hint">Prueba con otro nombre o categoría</p>
             <button class="btn btn-secondary" id="clearSearchBtn">Ver todo</button>
         </div>
     </section>
@@ -173,10 +225,11 @@
                 <p class="footer-address">Centro Histórico, Oaxaca de Juárez<br>Horario: Lun - Sáb 10:00 - 20:00</p>
             </div>
             <div class="footer-links">
-                <h4>Navegación</h4>
-                <a href="index.html">Inicio</a>
-                <a href="#productos">Productos</a>
-                <a href="#nuevos">Nuevos</a>
+                <h4>Categorías</h4>
+                <a href="#productos" data-filter="calzado">Calzado</a>
+                <a href="#productos" data-filter="accesorios">Accesorios</a>
+                <a href="#productos" data-filter="juvenil">Juvenil</a>
+                <a href="#productos" data-filter="infantil">Infantil</a>
             </div>
             <div class="footer-links">
                 <h4>Información</h4>
@@ -186,8 +239,8 @@
             </div>
             <div class="footer-links">
                 <h4>Contacto</h4>
-                <a href="#">contacto@converseoaxaca.mx</a>
-                <a href="#">+52 951 123 4567</a>
+                <a href="mailto:contacto@converseoaxaca.mx">contacto@converseoaxaca.mx</a>
+                <a href="tel:+529511234567">+52 951 123 4567</a>
             </div>
         </div>
         <div class="footer-bottom">
@@ -208,7 +261,6 @@
             </button>
         </div>
         <div class="cart-items" id="cartItems">
-            <!-- Items del carrito se cargan dinámicamente -->
             <div class="cart-empty" id="cartEmpty">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>

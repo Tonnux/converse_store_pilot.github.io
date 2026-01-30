@@ -198,23 +198,27 @@ ul, ol {
 }
 
 /* Logo */
+/* Logo */
 .logo {
     display: flex;
     align-items: center;
-    flex-shrink: 0;
-}
+    gap: 10px;
+    text-decoration: none;
+    line-height: 0;
+  }
+  
+  .logo-img {
+    height: 34px;          /* ajusta 30–40 según te guste */
+    width: auto;
+    display: block;
+    object-fit: contain;
+  }
 
-.logo-svg {
-    width: 100px;
-    height: auto;
-}
-
-@media (min-width: 768px) {
-    .logo-svg {
-        width: 120px;
-    }
-}
-
+  .header-container {
+    align-items: center;
+  }
+  
+  
 /* Navegación - Desktop */
 .nav-main {
     display: none;
